@@ -1,0 +1,108 @@
+/* Optional: Import Inter font from Google Fonts if not using Tailwind */
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); */
+
+body {
+    font-family: 'Inter', sans-serif; /* Ensure 'Inter' is available via Tailwind or Google Fonts */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #111827; /* Dark background (e.g., Tailwind bg-gray-900) */
+    color: #f3f4f6; /* Light text (e.g., Tailwind text-gray-100) */
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    width: 80vw; 
+    max-width: 960px; 
+    aspect-ratio: 16 / 9; 
+    background-color: #000;
+    border-radius: 0.75rem; 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
+    overflow: hidden;
+}
+
+#main-video-player {
+    display: block; 
+    width: 100%;
+    height: 100%;
+    border-radius: 0.75rem; 
+}
+
+#hotspot-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; 
+}
+
+.hotspot {
+    position: absolute;
+    background-color: rgba(255, 255, 0, 0.3); /* Semi-transparent yellow for visibility */
+    border: 2px solid rgba(255, 255, 0, 0.6); /* Yellow border */
+    border-radius: 0.5rem; /* For rectangular hotspots */
+    /* For CIRCULAR hotspots (as discussed in video draft), uncomment below and ensure JS sets equal width/height */
+    /* border-radius: 50%; */
+    cursor: pointer;
+    pointer-events: auto; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white; 
+    font-weight: bold;
+    font-size: 1rem; 
+    padding: 0.5rem; 
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.hotspot:hover {
+    background-color: rgba(255, 255, 0, 0.5); 
+    transform: scale(1.05); 
+}
+
+/* Style for circle hotspots specifically if you add a class or data-attribute */
+/* .hotspot[data-shape="circle"] {
+    border-radius: 50%;
+} */
+
+#message-area {
+    margin-top: 20px; 
+    padding: 10px 20px; 
+    background-color: #1f2937; 
+    border-radius: 0.5rem; 
+    font-size: 0.9rem;
+    color: #9ca3af; 
+    min-height: 2em;
+    text-align: center;
+    width: 80vw;
+    max-width: 960px;
+    box-sizing: border-box;
+}
+
+#controls {
+    margin-top: 20px; 
+    display: flex;
+    gap: 10px; 
+}
+
+.control-button {
+    background-color: #3b82f6; 
+    color: white; 
+    border: none;
+    padding: 10px 20px; 
+    margin: 0; 
+    border-radius: 0.5rem; 
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+}
+.control-button:hover {
+    background-color: #2563eb; 
+}
