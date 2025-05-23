@@ -175,10 +175,10 @@ function confirmCharacter(characterName) {
     activeCharacter = characterName; // Set global activeCharacter as well
     messageArea.textContent = `${characterName.charAt(0).toUpperCase() + characterName.slice(1)} selected!`;
     // Load the player-specific tunnel walkout
-    loadVideo(`pk_cin_tunnel_walk_${characterName}_01`);
+    loadVideo(`pk_cin_tunnel_walk_${characterName}_01`, true);
 }
 
-function loadVideo(videoKey) {
+function loadVideo(videoKey, autoplay = true) {
     if (!videoData[videoKey]) {
         console.error('Error: Video key not found:', videoKey);
         messageArea.textContent = `Error: Video key "${videoKey}" not found.`;
@@ -192,10 +192,10 @@ function loadVideo(videoKey) {
     if (data.isLogicHop && typeof data.onLogic === 'function') {
         const nextVideoKey = data.onLogic();
         if (nextVideoKey && videoData[nextVideoKey]) {
-            loadVideo(nextVideoKey);
+            loadVideo(nextVideoKey, autoplay);
         } else {
             console.error("Logic hop for '" + videoKey + "' did not return a valid next video key or key not found:", nextVideoKey);
-            loadVideo('pk_cin_stadium_flythrough_01'); // Fallback
+            loadVideo('pk_cin_stadium_flythrough_01', autoplay); // Fallback
         }
         return;
     }
@@ -205,7 +205,10 @@ function loadVideo(videoKey) {
     // messageArea.textContent = `Loading: ${videoKey}`; // Keep this minimal to avoid overwriting important messages too quickly
     
     clearHotspots();
-    videoPlayer.load(); 
+    videoPlayer.load();
+    if (autoplay) {
+        videoPlayer.play().catch(handlePlayError);
+    }
     updatePlayPauseButton();
 }
 
@@ -250,7 +253,7 @@ function createHotspots() {
                     handleShotChoice(shotDir); 
                 } else if (target) {
                     // messageArea.textContent = `Hotspot "${hs.id}" clicked! Loading: ${target}`; // Can be too verbose
-                    loadVideo(target);
+                    loadVideo(target, true);
                 } else {
                     console.warn("Hotspot clicked but no targetVideo/logic defined:", hs);
                 }
@@ -317,12 +320,12 @@ function handleShotChoice(shotDirection) {
 
 
     if (videoData[outcomeVideoKey]) {
-        loadVideo(outcomeVideoKey);
+        loadVideo(outcomeVideoKey, true);
     } else {
         console.error("Outcome video key not found:", outcomeVideoKey);
         messageArea.textContent = `Error: Outcome video for ${shotDirection} vs ${randomKeeperAction} (${gameState.selectedCharacterName}) not found. Key: ${outcomeVideoKey}`;
         // Fallback: go to a generic reaction for the player or to scoreboard
-        loadVideo(goalScored ? `pk_react_goal_player_celeb_${gameState.selectedCharacterName}_01` : `pk_react_save_keeper_celeb_${gameState.selectedCharacterName}_01`);
+        loadVideo(goalScored ? `pk_react_goal_player_celeb_${gameState.selectedCharacterName}_01` : `pk_react_save_keeper_celeb_${gameState.selectedCharacterName}_01`, true);
     }
 }
 
@@ -349,7 +352,7 @@ videoPlayer.addEventListener('ended', () => {
     const data = videoData[currentVideoKey];
     if (data && data.onEnd) {
         // messageArea.textContent = `Video "${currentVideoKey}" ended. Loading next: ${data.onEnd}`;
-        loadVideo(data.onEnd);
+        loadVideo(data.onEnd, true);
     } else if (data && !data.isLogicHop) {
          messageArea.textContent = `Video "${currentVideoKey}" ended.`;
     }
@@ -386,7 +389,7 @@ videoPlayer.addEventListener('error', (e) => {
 playPauseButton.addEventListener('click', () => {
     if (!videoPlayer.src || videoPlayer.src === window.location.href || videoPlayer.error) {
         messageArea.textContent = "No valid video or error. Loading initial...";
-        loadVideo(currentVideoKey || 'pk_cin_stadium_flythrough_01'); 
+        loadVideo(currentVideoKey || 'pk_cin_stadium_flythrough_01', false);
         setTimeout(() => { 
             if (videoPlayer.src && videoPlayer.src !== window.location.href && !videoPlayer.error) {
                  videoPlayer.play().catch(handlePlayError);
@@ -407,11 +410,11 @@ function handlePlayError(error) {
 restartButton.addEventListener('click', () => {
     messageArea.textContent = 'Restarting game...';
     videoPlayer.pause(); resetGameState();
-    loadVideo('pk_cin_stadium_flythrough_01');
+    loadVideo('pk_cin_stadium_flythrough_01', true);
 });
 
 window.addEventListener('load', () => {
     resetGameState();
-    loadVideo('pk_cin_stadium_flythrough_01'); 
+    loadVideo('pk_cin_stadium_flythrough_01', false);
     messageArea.textContent = "Game loaded. Press Play.";
 });
