@@ -6,6 +6,7 @@ const playPauseButton = document.getElementById('play-pause-button');
 const restartButton = document.getElementById('restart-button');
 
 // --- Game State & Configuration ---
+let activeHotspots = [];
 let activeCharacter = 'ronaldo'; // Default character
 let gameState = {
     playerScore: 0,
