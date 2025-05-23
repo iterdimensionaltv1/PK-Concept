@@ -202,7 +202,8 @@ function loadVideo(videoKey, autoplay = true) {
     }
     
     videoPlayer.src = data.src;
-    videoPlayer.poster = data.poster || `https://placehold.co/960x540/111/FFF?text=${videoKey.replace(/_/g, '+')}`;
+    // Remove placeholder posters between videos for a seamless transition
+    videoPlayer.removeAttribute('poster');
     // messageArea.textContent = `Loading: ${videoKey}`; // Keep this minimal to avoid overwriting important messages too quickly
     
     clearHotspots();
