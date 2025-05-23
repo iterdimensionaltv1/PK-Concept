@@ -42,10 +42,9 @@ body {
 
 .hotspot {
     position: absolute;
-    background-color: rgba(255, 255, 255, 0.1); /* subtle translucent background */
-    border: 2px solid rgba(255, 255, 255, 0.6); /* light border for visibility */
-    border-radius: 0.375rem;
-    /* For CIRCULAR hotspots, ensure JS sets equal width/height */
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid #22c55e;
+    border-radius: 0.5rem;
     cursor: pointer;
     pointer-events: auto;
     display: flex;
@@ -53,23 +52,26 @@ body {
     justify-content: center;
     text-align: center;
     color: #ffffff;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
     padding: 0.5rem;
     box-sizing: border-box;
-    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .hotspot:hover {
-    background-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-    transform: scale(1.08);
+    background-color: rgba(0, 0, 0, 0.55);
+    border-color: #4ade80;
+    box-shadow: 0 0 8px #22c55e;
+    transform: scale(1.1);
 }
 
-/* Style for circle hotspots specifically if you add a class or data-attribute */
-/* .hotspot[data-shape="circle"] {
+.hotspot.circle {
     border-radius: 50%;
-} */
+    padding: 0;
+}
 
 #message-area {
     margin-top: 20px; 

@@ -226,6 +226,7 @@ function createHotspots() {
         if (currentTime >= hs.startTime && currentTime <= hs.endTime) {
             const hotspotElement = document.createElement('div');
             hotspotElement.className = 'hotspot';
+            if (hs.shape === 'circle') hotspotElement.classList.add('circle');
             hotspotElement.id = `hotspot-${hs.id}`;
             hotspotElement.textContent = hs.text || ''; 
             hotspotElement.dataset.targetVideo = hs.targetVideo; 
