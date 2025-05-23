@@ -42,28 +42,28 @@ body {
 
 .hotspot {
     position: absolute;
-    background-color: rgba(255, 255, 0, 0.3); /* Semi-transparent yellow for visibility */
-    border: 2px solid rgba(255, 255, 0, 0.6); /* Yellow border */
-    border-radius: 0.5rem; /* For rectangular hotspots */
-    /* For CIRCULAR hotspots (as discussed in video draft), uncomment below and ensure JS sets equal width/height */
-    /* border-radius: 50%; */
+    background-color: rgba(255, 255, 255, 0.1); /* subtle translucent background */
+    border: 2px solid rgba(255, 255, 255, 0.6); /* light border for visibility */
+    border-radius: 0.375rem;
+    /* For CIRCULAR hotspots, ensure JS sets equal width/height */
     cursor: pointer;
-    pointer-events: auto; 
+    pointer-events: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: white; 
-    font-weight: bold;
-    font-size: 1rem; 
-    padding: 0.5rem; 
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem;
     box-sizing: border-box;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hotspot:hover {
-    background-color: rgba(255, 255, 0, 0.5); 
-    transform: scale(1.05); 
+    background-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    transform: scale(1.08);
 }
 
 /* Style for circle hotspots specifically if you add a class or data-attribute */
