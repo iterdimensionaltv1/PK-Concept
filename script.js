@@ -4,6 +4,7 @@ const hotspotContainer = document.getElementById('hotspot-container');
 const messageArea = document.getElementById('message-area');
 const playPauseButton = document.getElementById('play-pause-button');
 const restartButton = document.getElementById('restart-button');
+const overlayPlayButton = document.getElementById('overlay-play-button');
 
 // --- Game State & Configuration ---
 let activeHotspots = [];
@@ -391,16 +392,20 @@ playPauseButton.addEventListener('click', () => {
     if (!videoPlayer.src || videoPlayer.src === window.location.href || videoPlayer.error) {
         messageArea.textContent = "No valid video or error. Loading initial...";
         loadVideo(currentVideoKey || 'pk_cin_stadium_flythrough_01', false);
-        setTimeout(() => { 
+        setTimeout(() => {
             if (videoPlayer.src && videoPlayer.src !== window.location.href && !videoPlayer.error) {
                  videoPlayer.play().catch(handlePlayError);
-            } else if (!videoPlayer.error) { 
+            } else if (!videoPlayer.error) {
                 messageArea.textContent = "Src not set. Check config.";
             }
         }, 150); return;
     }
-    if (videoPlayer.paused || videoPlayer.ended) videoPlayer.play().catch(handlePlayError);
-    else videoPlayer.pause();
+    if (videoPlayer.paused || videoPlayer.ended) {
+        videoPlayer.play().catch(handlePlayError);
+        overlayPlayButton.classList.add('hidden');
+    } else {
+        videoPlayer.pause();
+    }
 });
 
 function handlePlayError(error) {
@@ -414,8 +419,14 @@ restartButton.addEventListener('click', () => {
     loadVideo('pk_cin_stadium_flythrough_01', true);
 });
 
+overlayPlayButton.addEventListener('click', () => {
+    overlayPlayButton.classList.add('hidden');
+    videoPlayer.play().catch(handlePlayError);
+});
+
 window.addEventListener('load', () => {
     resetGameState();
     loadVideo('pk_cin_stadium_flythrough_01', false);
+    overlayPlayButton.classList.remove('hidden');
     messageArea.textContent = "Game loaded. Press Play.";
 });
