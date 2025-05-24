@@ -233,8 +233,11 @@ function confirmCharacter(characterName) {
 }
 
 function handleBackgroundAudio(videoKey) {
+    if (!bgAudio) return;
+
+    // Start the loop when entering character select
     if (CHARACTER_SELECT_VIDEOS.includes(videoKey)) {
-        if (bgAudio && bgAudio.paused) {
+        if (bgAudio.paused) {
             try {
                 bgAudio.currentTime = 0;
                 bgAudio.play();
@@ -242,9 +245,16 @@ function handleBackgroundAudio(videoKey) {
                 console.error('Audio play error:', e);
             }
         }
-    } else if (bgAudio && !bgAudio.paused) {
-        bgAudio.pause();
-        bgAudio.currentTime = 0;
+    } else {
+        // Once started, keep the music playing for the rest of the game
+        if (bgAudio.paused) {
+            try {
+                bgAudio.play();
+            } catch (e) {
+                console.error('Audio play error:', e);
+            }
+        }
+        // Intentionally do not pause when leaving character select
     }
 }
 
