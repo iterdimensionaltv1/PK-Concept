@@ -6,6 +6,8 @@ const playPauseButton = document.getElementById('play-pause-button');
 const restartButton = document.getElementById('restart-button');
 const overlayPlayButton = document.getElementById('overlay-play-button');
 const bgAudio = document.getElementById('bg-audio');
+const clickAudio = document.getElementById('click-sound');
+const confirmAudio = document.getElementById('confirm-sound');
 
 // --- Game State & Configuration ---
 let activeHotspots = [];
@@ -176,6 +178,7 @@ function resetGameState() {
 }
 
 function confirmCharacter(characterName) {
+    playConfirmClick();
     gameState.selectedCharacterName = characterName;
     activeCharacter = characterName; // Set global activeCharacter as well
     messageArea.textContent = `${characterName.charAt(0).toUpperCase() + characterName.slice(1)} selected!`;
@@ -196,6 +199,28 @@ function handleBackgroundAudio(videoKey) {
     } else if (bgAudio && !bgAudio.paused) {
         bgAudio.pause();
         bgAudio.currentTime = 0;
+    }
+}
+
+function playUiClick() {
+    if (clickAudio) {
+        try {
+            clickAudio.currentTime = 0;
+            clickAudio.play();
+        } catch (e) {
+            console.error('Audio play error:', e);
+        }
+    }
+}
+
+function playConfirmClick() {
+    if (confirmAudio) {
+        try {
+            confirmAudio.currentTime = 0;
+            confirmAudio.play();
+        } catch (e) {
+            console.error('Audio play error:', e);
+        }
     }
 }
 
@@ -267,6 +292,7 @@ function createHotspots() {
             }
             
             hotspotElement.addEventListener('click', (event) => {
+                playUiClick();
                 const target = event.currentTarget.dataset.targetVideo;
                 const shotDir = event.currentTarget.dataset.shotDirection;
                 const characterToConfirm = event.currentTarget.dataset.character;
@@ -411,6 +437,7 @@ videoPlayer.addEventListener('error', (e) => {
 });
 
 playPauseButton.addEventListener('click', () => {
+    playUiClick();
     if (!videoPlayer.src || videoPlayer.src === window.location.href || videoPlayer.error) {
         messageArea.textContent = "No valid video or error. Loading initial...";
         loadVideo(currentVideoKey || 'pk_cin_stadium_flythrough_01', false);
@@ -436,12 +463,14 @@ function handlePlayError(error) {
 }
 
 restartButton.addEventListener('click', () => {
+    playUiClick();
     messageArea.textContent = 'Restarting game...';
     videoPlayer.pause(); resetGameState();
     loadVideo('pk_cin_stadium_flythrough_01', true);
 });
 
 overlayPlayButton.addEventListener('click', () => {
+    playUiClick();
     overlayPlayButton.classList.add('hidden');
     videoPlayer.play().catch(handlePlayError);
 });
