@@ -197,12 +197,21 @@ function showMainMenuScreen() {
     if (mainMenuScreen) {
         mainMenuScreen.classList.remove('hidden');
         overlayPlayButton.classList.add('hidden');
+        const menuVideo = document.getElementById('main-menu-background');
+        if (menuVideo) {
+            menuVideo.play().catch(() => {});
+        }
     }
 }
 
 function hideMainMenuScreen() {
     if (mainMenuScreen) {
         mainMenuScreen.classList.add('hidden');
+        const menuVideo = document.getElementById('main-menu-background');
+        if (menuVideo) {
+            menuVideo.pause();
+            menuVideo.currentTime = 0;
+        }
     }
 }
 

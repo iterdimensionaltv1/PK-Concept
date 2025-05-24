@@ -170,8 +170,26 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0,0,0,0.8);
+  overflow: hidden;
   z-index: 20;
+}
+.menu-screen .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 10;
+}
+#main-menu-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
 }
 .menu-screen.hidden { display: none; }
 .menu-button {
