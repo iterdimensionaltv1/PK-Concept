@@ -5,6 +5,7 @@ const messageArea = document.getElementById('message-area');
 const playPauseButton = document.getElementById('play-pause-button');
 const restartButton = document.getElementById('restart-button');
 const overlayPlayButton = document.getElementById('overlay-play-button');
+const bgAudio = document.getElementById('bg-audio');
 
 // --- Game State & Configuration ---
 let activeHotspots = [];
@@ -16,6 +17,8 @@ let gameState = {
     maxKicks: 5,
     selectedCharacterName: 'ronaldo' // Store 'ronaldo' or 'messi'
 };
+
+const CHARACTER_SELECT_VIDEOS = ['pk_charselect_ronaldo_01', 'pk_charselect_messi_01'];
 
 // --- Video Data ---
 const videoData = {
@@ -180,6 +183,22 @@ function confirmCharacter(characterName) {
     loadVideo(`pk_cin_tunnel_walk_${characterName}_01`, true);
 }
 
+function handleBackgroundAudio(videoKey) {
+    if (CHARACTER_SELECT_VIDEOS.includes(videoKey)) {
+        if (bgAudio && bgAudio.paused) {
+            try {
+                bgAudio.currentTime = 0;
+                bgAudio.play();
+            } catch (e) {
+                console.error('Audio play error:', e);
+            }
+        }
+    } else if (bgAudio && !bgAudio.paused) {
+        bgAudio.pause();
+        bgAudio.currentTime = 0;
+    }
+}
+
 function loadVideo(videoKey, autoplay = true) {
     if (!videoData[videoKey]) {
         console.error('Error: Video key not found:', videoKey);
@@ -189,6 +208,7 @@ function loadVideo(videoKey, autoplay = true) {
     }
 
     currentVideoKey = videoKey;
+    handleBackgroundAudio(videoKey);
     const data = videoData[videoKey];
 
     if (data.isLogicHop && typeof data.onLogic === 'function') {
