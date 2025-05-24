@@ -153,13 +153,15 @@ const videoData = {
         src: 'videos/pk_cin_tunnel_walk_ronaldo_01.mp4',
         poster: 'https://placehold.co/960x540/555/FFF?text=Ronaldo+Tunnel+Walk',
         hotspots: [],
-        onEnd: 'pk_cin_name_screen_ronaldo_01'
+        // Directly transition from the tunnel walkout to the penalty setup
+        onEnd: 'pk_game_penalty_setup_ronaldo_01'
     },
     'pk_cin_tunnel_walk_messi_01': {
         src: 'videos/pk_cin_tunnel_walk_messi_01.mp4',
         poster: 'https://placehold.co/960x540/555/FFF?text=Messi+Tunnel+Walk',
         hotspots: [],
-        onEnd: 'pk_cin_name_screen_messi_01'
+        // Skip the name screen and go straight to the penalty setup
+        onEnd: 'pk_game_penalty_setup_messi_01'
     },
 
     // IV. Post-Selection Cinematics (Player Specific Name Screen)
