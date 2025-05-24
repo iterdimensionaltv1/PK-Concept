@@ -446,11 +446,13 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: 2rem;
   overflow: hidden;
   z-index: 20;
+  padding: 2rem;
 }
 
 .menu-screen .overlay {
@@ -480,7 +482,6 @@ body {
 }
 
 .menu-button {
-  margin: 0.75rem;
   padding: 1.25rem 2.5rem;
   font-size: 1.25rem;
   font-weight: 600;
@@ -501,7 +502,8 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
-  min-width: 200px;
+  min-width: 180px;
+  flex-shrink: 0;
 }
 
 .menu-button::before {
@@ -570,7 +572,25 @@ body {
 }
 
 /* Responsive Design */
+@media (min-width: 1200px) {
+  .menu-screen {
+    gap: 3rem;
+  }
+  
+  .menu-button {
+    min-width: 200px;
+    padding: 1.5rem 3rem;
+    font-size: 1.375rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .menu-screen {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+  
   .btn-xl {
     padding: 1rem 2rem;
     font-size: 1.125rem;
@@ -579,7 +599,7 @@ body {
   .menu-button {
     padding: 1rem 2rem;
     font-size: 1.125rem;
-    min-width: 180px;
+    min-width: 160px;
   }
   
   #overlay-play-button {
@@ -594,6 +614,10 @@ body {
 }
 
 @media (max-width: 480px) {
+  .menu-screen {
+    gap: 1rem;
+  }
+  
   .btn-xl {
     padding: 0.875rem 1.75rem;
     font-size: 1rem;
@@ -602,7 +626,7 @@ body {
   .menu-button {
     padding: 0.875rem 1.75rem;
     font-size: 1rem;
-    min-width: 160px;
+    min-width: 140px;
   }
   
   #overlay-play-button {
