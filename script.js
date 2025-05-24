@@ -199,6 +199,7 @@ function showMainMenuScreen() {
         overlayPlayButton.classList.add('hidden');
         const menuVideo = document.getElementById('main-menu-background');
         if (menuVideo) {
+            menuVideo.load();
             menuVideo.play().catch(() => {});
         }
     }
