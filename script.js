@@ -252,7 +252,7 @@ function loadVideo(videoKey, autoplay = true) {
 
     if (CHARACTER_SELECT_VIDEOS.includes(videoKey)) {
         showCharacterSelectScreen();
-        return;
+        // Continue loading the idle video so it plays behind the UI
     } else {
         hideCharacterSelectScreen();
     }
