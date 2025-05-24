@@ -461,7 +461,7 @@ body {
   gap: 2rem;
   align-items: center;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 8rem;
 }
 
 .menu-screen .overlay {
@@ -471,8 +471,6 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   z-index: 10;
 }
 
