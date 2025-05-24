@@ -528,7 +528,7 @@ overlayPlayButton.addEventListener('click', () => {
     videoPlayer.play().catch(handlePlayError);
 });
 
-window.addEventListener('load', () => {
+function initializeMenu() {
     resetGameState();
     showMainMenuScreen();
     messageArea.textContent = "Welcome to Penalty King!";
@@ -544,7 +544,13 @@ window.addEventListener('load', () => {
     const playBtn = document.getElementById('menu-play');
     const charBtn = document.getElementById('menu-character-select');
     const settingsBtn = document.getElementById('menu-settings');
-    [playBtn, charBtn, settingsBtn].forEach(btn => {
-        if (btn) btn.addEventListener('click', startGame);
-    });
-});
+    if (playBtn) playBtn.addEventListener('click', startGame);
+    if (charBtn) charBtn.addEventListener('click', showCharacterSelectScreen);
+    if (settingsBtn) settingsBtn.addEventListener('click', startGame);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeMenu);
+} else {
+    initializeMenu();
+}
