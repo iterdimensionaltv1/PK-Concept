@@ -126,3 +126,35 @@ body {
 #overlay-play-button.hidden {
     display: none;
 }
+/* Character Select UI Styles */
+.glassmorphism {
+  background: rgba(25, 120, 229, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.holographic-button {
+  background: linear-gradient(135deg, rgba(25, 120, 229, 0.8) 0%, rgba(25, 120, 229, 0.5) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(25, 120, 229, 0.5);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.holographic-button:hover {
+  background: linear-gradient(135deg, rgba(25, 120, 229, 1) 0%, rgba(25, 120, 229, 0.7) 100%);
+  box-shadow: 0 10px 30px rgba(25, 120, 229, 0.7);
+  transform: translateY(-3px) scale(1.05);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+.holographic-button:active {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(25, 120, 229, 0.6);
+}
+.player-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.player-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 30px rgba(25, 120, 229, 0.5);
+}
+#character-select-screen.hidden { display: none; }

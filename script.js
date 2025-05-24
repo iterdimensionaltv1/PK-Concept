@@ -8,6 +8,7 @@ const overlayPlayButton = document.getElementById('overlay-play-button');
 const bgAudio = document.getElementById('bg-audio');
 const clickAudio = document.getElementById('click-sound');
 const confirmAudio = document.getElementById('confirm-sound');
+const charSelectScreen = document.getElementById('character-select-screen');
 
 // --- Game State & Configuration ---
 let activeHotspots = [];
@@ -177,6 +178,20 @@ function resetGameState() {
     messageArea.textContent = "Game state reset. Ronaldo selected.";
 }
 
+function showCharacterSelectScreen() {
+    if (charSelectScreen) {
+        charSelectScreen.classList.remove('hidden');
+        overlayPlayButton.classList.add('hidden');
+        videoPlayer.pause();
+    }
+}
+
+function hideCharacterSelectScreen() {
+    if (charSelectScreen) {
+        charSelectScreen.classList.add('hidden');
+    }
+}
+
 function confirmCharacter(characterName) {
     playConfirmClick();
     gameState.selectedCharacterName = characterName;
@@ -234,6 +249,14 @@ function loadVideo(videoKey, autoplay = true) {
 
     currentVideoKey = videoKey;
     handleBackgroundAudio(videoKey);
+
+    if (CHARACTER_SELECT_VIDEOS.includes(videoKey)) {
+        showCharacterSelectScreen();
+        return;
+    } else {
+        hideCharacterSelectScreen();
+    }
+
     const data = videoData[videoKey];
 
     if (data.isLogicHop && typeof data.onLogic === 'function') {
@@ -480,4 +503,12 @@ window.addEventListener('load', () => {
     loadVideo('pk_cin_stadium_flythrough_01', false);
     overlayPlayButton.classList.remove('hidden');
     messageArea.textContent = "Game loaded. Press Play.";
+
+    document.querySelectorAll('.select-character').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const character = btn.dataset.character;
+            hideCharacterSelectScreen();
+            confirmCharacter(character);
+        });
+    });
 });
