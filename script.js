@@ -24,6 +24,102 @@ let gameState = {
 
 const CHARACTER_SELECT_VIDEOS = ['pk_charselect_ronaldo_01', 'pk_charselect_messi_01'];
 
+// --- Video Preloading & Transition Management ---
+let preloadedVideos = new Map(); // Cache for preloaded video elements
+let nextVideoElement = null; // Pre-created video element for the next video
+let isTransitioning = false; // Flag to prevent multiple transitions
+let lastFrameCanvas = null; // Canvas to capture last frame
+let lastFrameContext = null; // Canvas context
+
+// Initialize canvas for capturing last frames
+function initializeLastFrameCapture() {
+    lastFrameCanvas = document.createElement('canvas');
+    lastFrameCanvas.style.position = 'absolute';
+    lastFrameCanvas.style.top = '0';
+    lastFrameCanvas.style.left = '0';
+    lastFrameCanvas.style.width = '100%';
+    lastFrameCanvas.style.height = '100%';
+    lastFrameCanvas.style.pointerEvents = 'none';
+    lastFrameCanvas.style.zIndex = '1';
+    lastFrameContext = lastFrameCanvas.getContext('2d');
+    document.getElementById('game-container').appendChild(lastFrameCanvas);
+}
+
+// Capture current video frame to canvas
+function captureCurrentFrame() {
+    if (videoPlayer.readyState >= 2 && lastFrameCanvas && lastFrameContext) {
+        lastFrameCanvas.width = videoPlayer.videoWidth;
+        lastFrameCanvas.height = videoPlayer.videoHeight;
+        lastFrameContext.drawImage(videoPlayer, 0, 0);
+        lastFrameCanvas.style.display = 'block';
+    }
+}
+
+// Hide the last frame canvas
+function hideLastFrame() {
+    if (lastFrameCanvas) {
+        lastFrameCanvas.style.display = 'none';
+    }
+}
+
+// Preload a video by creating a video element and loading it
+function preloadVideo(videoKey) {
+    if (!videoData[videoKey] || preloadedVideos.has(videoKey)) return;
+    
+    const data = videoData[videoKey];
+    if (data.isLogicHop) return;
+    
+    const video = document.createElement('video');
+    video.preload = 'auto';
+    video.src = data.src;
+    video.load();
+    
+    video.addEventListener('loadeddata', () => {
+        console.log(`Preloaded: ${videoKey}`);
+        preloadedVideos.set(videoKey, video);
+    });
+    
+    video.addEventListener('error', () => {
+        console.error(`Failed to preload: ${videoKey}`);
+        preloadedVideos.delete(videoKey);
+    });
+}
+
+// Predict and preload next videos based on current video
+function predictAndPreloadNextVideos(currentKey) {
+    const data = videoData[currentKey];
+    if (!data) return;
+    
+    // Preload the onEnd video
+    if (data.onEnd && videoData[data.onEnd]) {
+        preloadVideo(data.onEnd);
+    }
+    
+    // Preload all hotspot target videos
+    if (data.hotspots) {
+        data.hotspots.forEach(hotspot => {
+            if (hotspot.targetVideo && videoData[hotspot.targetVideo]) {
+                preloadVideo(hotspot.targetVideo);
+            }
+        });
+    }
+    
+    // For character selection, preload the tunnel walk videos
+    if (currentKey.includes('charselect')) {
+        preloadVideo('pk_cin_tunnel_walk_ronaldo_01');
+        preloadVideo('pk_cin_tunnel_walk_messi_01');
+    }
+    
+    // For penalty setup, preload common outcome videos
+    if (currentKey.includes('penalty_setup')) {
+        const character = gameState.selectedCharacterName;
+        // Preload a few common outcomes
+        preloadVideo(`pk_shot_left_vs_keeper_dive_right_goal_${character}_01`);
+        preloadVideo(`pk_shot_middle_vs_keeper_stay_middle_save_${character}_01`);
+        preloadVideo(`pk_shot_right_vs_keeper_dive_left_goal_${character}_01`);
+    }
+}
+
 // --- Video Data ---
 const videoData = {
     // I. Initial Pre-Match Cinematic
@@ -168,6 +264,7 @@ const videoData = {
 };
 
 let currentVideoKey = 'pk_cin_stadium_flythrough_01'; // Start of the game
+
 // --- Functions ---
 
 function resetGameState() {
@@ -177,6 +274,9 @@ function resetGameState() {
     gameState.kicksTaken = 0;
     gameState.selectedCharacterName = 'ronaldo';
     messageArea.textContent = "Game state reset. Ronaldo selected.";
+    
+    // Clear preloaded videos on reset
+    preloadedVideos.clear();
 }
 
 function showCharacterSelectScreen() {
@@ -280,7 +380,13 @@ function playConfirmClick() {
     }
 }
 
-function loadVideo(videoKey, autoplay = true) {
+// Enhanced loadVideo function with smooth transitions
+async function loadVideo(videoKey, autoplay = true) {
+    if (isTransitioning) {
+        console.log('Already transitioning, skipping:', videoKey);
+        return;
+    }
+    
     if (!videoData[videoKey]) {
         console.error('Error: Video key not found:', videoKey);
         messageArea.textContent = `Error: Video key "${videoKey}" not found.`;
@@ -288,6 +394,7 @@ function loadVideo(videoKey, autoplay = true) {
         return;
     }
 
+    isTransitioning = true;
     currentVideoKey = videoKey;
     handleBackgroundAudio(videoKey);
 
@@ -300,28 +407,84 @@ function loadVideo(videoKey, autoplay = true) {
 
     const data = videoData[videoKey];
 
+    // Handle logic hops
     if (data.isLogicHop && typeof data.onLogic === 'function') {
         const nextVideoKey = data.onLogic();
         if (nextVideoKey && videoData[nextVideoKey]) {
+            isTransitioning = false;
             loadVideo(nextVideoKey, autoplay);
         } else {
             console.error("Logic hop for '" + videoKey + "' did not return a valid next video key or key not found:", nextVideoKey);
+            isTransitioning = false;
             loadVideo('pk_cin_stadium_flythrough_01', autoplay); // Fallback
         }
         return;
     }
     
-    videoPlayer.src = data.src;
-    // Remove placeholder posters between videos for a seamless transition
-    videoPlayer.removeAttribute('poster');
-    // messageArea.textContent = `Loading: ${videoKey}`; // Keep this minimal to avoid overwriting important messages too quickly
-    
-    clearHotspots();
-    videoPlayer.load();
-    if (autoplay) {
-        videoPlayer.play().catch(handlePlayError);
+    // Capture the current frame before switching
+    if (videoPlayer.readyState >= 2 && !videoPlayer.paused && !videoPlayer.ended) {
+        captureCurrentFrame();
     }
+    
+    // Check if video is preloaded
+    const preloadedVideo = preloadedVideos.get(videoKey);
+    
+    if (preloadedVideo && preloadedVideo.readyState >= 3) {
+        // Use preloaded video data
+        videoPlayer.src = data.src;
+        clearHotspots();
+        
+        // Wait for the new video to be ready
+        videoPlayer.load();
+        
+        const playPromise = new Promise((resolve) => {
+            const onCanPlay = () => {
+                videoPlayer.removeEventListener('canplay', onCanPlay);
+                hideLastFrame();
+                if (autoplay) {
+                    videoPlayer.play().then(resolve).catch(err => {
+                        handlePlayError(err);
+                        resolve();
+                    });
+                } else {
+                    resolve();
+                }
+            };
+            videoPlayer.addEventListener('canplay', onCanPlay);
+        });
+        
+        await playPromise;
+    } else {
+        // Load video normally
+        videoPlayer.src = data.src;
+        clearHotspots();
+        videoPlayer.load();
+        
+        // Wait for video to be ready
+        const loadPromise = new Promise((resolve) => {
+            const onLoadedData = () => {
+                videoPlayer.removeEventListener('loadeddata', onLoadedData);
+                hideLastFrame();
+                if (autoplay) {
+                    videoPlayer.play().then(resolve).catch(err => {
+                        handlePlayError(err);
+                        resolve();
+                    });
+                } else {
+                    resolve();
+                }
+            };
+            videoPlayer.addEventListener('loadeddata', onLoadedData);
+        });
+        
+        await loadPromise;
+    }
+    
+    // Predict and preload next videos
+    predictAndPreloadNextVideos(videoKey);
+    
     updatePlayPauseButton();
+    isTransitioning = false;
 }
 
 function createHotspots() {
@@ -366,7 +529,8 @@ function createHotspots() {
                 } else if (target === 'LOGIC_HANDLE_SHOT' && shotDir) {
                     handleShotChoice(shotDir); 
                 } else if (target) {
-                    // messageArea.textContent = `Hotspot "${hs.id}" clicked! Loading: ${target}`; // Can be too verbose
+                    // Preload the target video before loading
+                    preloadVideo(target);
                     loadVideo(target, true);
                 } else {
                     console.warn("Hotspot clicked but no targetVideo/logic defined:", hs);
@@ -392,7 +556,6 @@ function updatePlayPauseButton() {
 }
 
 function handleShotChoice(shotDirection) {
-    // messageArea.textContent = `${gameState.selectedCharacterName} shoots ${shotDirection}...`;
     const keeperActions = ['dive_left', 'dive_right', 'stay_middle'];
     const randomKeeperAction = keeperActions[Math.floor(Math.random() * keeperActions.length)];
     
@@ -412,19 +575,9 @@ function handleShotChoice(shotDirection) {
         else { outcomeKeyRoot = `shot_right_vs_keeper_${randomKeeperAction === 'dive_left' ? 'dive_left' : 'stay_middle'}_goal_${gameState.selectedCharacterName}_01`; goalScored = true; }
     }
     
-    // Ensure all 9x2 outcome keys are defined in videoData, this is a simplified mapping
-    // For robustness, you should ensure the exact key is constructed and exists.
-    // The example outcome keys in videoData are specific. Here, we are constructing them.
-    // It would be better to have a direct lookup:
-    // outcomeVideoKeyMap[shotDirection][randomKeeperAction][gameState.selectedCharacterName]
-    // For now, we assume the constructed key `outcomeKeyRoot` matches an entry in videoData.
-    // This example will likely fail if the specific outcome keys (e.g. `pk_shot_L_vs_keepM_goal_ronaldo_01`) are not manually added.
-    // I will add them for 'left' shot for demo purposes.
     const outcomeVideoKey = outcomeKeyRoot;
 
-
     if (goalScored) { gameState.playerScore++; } 
-    // else { gameState.opponentScore++; } // If tracking opponent score
     gameState.kicksTaken++;
     
     // Update message AFTER a short delay to let current action message show
@@ -432,19 +585,21 @@ function handleShotChoice(shotDirection) {
         messageArea.textContent = `Keeper ${randomKeeperAction}. ${goalScored ? 'GOAL!' : 'SAVE!'} (${gameState.selectedCharacterName}). Score: ${gameState.playerScore}. Kicks: ${gameState.kicksTaken}/${gameState.maxKicks}`;
     }, 100);
 
-
+    // Preload the outcome video before playing
     if (videoData[outcomeVideoKey]) {
+        preloadVideo(outcomeVideoKey);
         loadVideo(outcomeVideoKey, true);
     } else {
         console.error("Outcome video key not found:", outcomeVideoKey);
         messageArea.textContent = `Error: Outcome video for ${shotDirection} vs ${randomKeeperAction} (${gameState.selectedCharacterName}) not found. Key: ${outcomeVideoKey}`;
         // Fallback: go to a generic reaction for the player or to scoreboard
-        loadVideo(goalScored ? `pk_react_goal_player_celeb_${gameState.selectedCharacterName}_01` : `pk_react_save_keeper_celeb_${gameState.selectedCharacterName}_01`, true);
+        const fallbackKey = goalScored ? `pk_react_goal_player_celeb_${gameState.selectedCharacterName}_01` : `pk_react_save_keeper_celeb_${gameState.selectedCharacterName}_01`;
+        preloadVideo(fallbackKey);
+        loadVideo(fallbackKey, true);
     }
 }
 
-
-// --- Event Listeners & Initial Load (Mostly unchanged, check for context) ---
+// --- Event Listeners ---
 videoPlayer.addEventListener('timeupdate', () => {
     const data = videoData[currentVideoKey];
     if (!data || !data.hotspots || data.hotspots.length === 0 || data.isLogicHop) {
@@ -462,10 +617,12 @@ videoPlayer.addEventListener('timeupdate', () => {
 });
 
 videoPlayer.addEventListener('ended', () => {
-    updatePlayPauseButton(); clearHotspots(); 
+    updatePlayPauseButton(); 
+    clearHotspots(); 
     const data = videoData[currentVideoKey];
     if (data && data.onEnd) {
-        // messageArea.textContent = `Video "${currentVideoKey}" ended. Loading next: ${data.onEnd}`;
+        // Preload the next video before loading
+        preloadVideo(data.onEnd);
         loadVideo(data.onEnd, true);
     } else if (data && !data.isLogicHop) {
          messageArea.textContent = `Video "${currentVideoKey}" ended.`;
@@ -474,20 +631,18 @@ videoPlayer.addEventListener('ended', () => {
 
 videoPlayer.addEventListener('play', () => {
     const data = videoData[currentVideoKey];
-    if (data && !data.isLogicHop) { /* messageArea.textContent = `Playing: ${data.src ? data.src : currentVideoKey}`; */ }
     updatePlayPauseButton();
 });
 
 videoPlayer.addEventListener('pause', () => {
     const data = videoData[currentVideoKey];
-    if (!videoPlayer.ended && data && !data.isLogicHop) { /* messageArea.textContent = `Paused: ${currentVideoKey}`; */ }
     updatePlayPauseButton();
 });
         
 videoPlayer.addEventListener('loadeddata', () => {
     const data = videoData[currentVideoKey];
-    if (data && !data.isLogicHop) { /* messageArea.textContent = `Video "${currentVideoKey}" loaded.`; */ }
-    createHotspots(); updatePlayPauseButton();
+    createHotspots(); 
+    updatePlayPauseButton();
 });
 
 videoPlayer.addEventListener('error', (e) => {
@@ -498,6 +653,8 @@ videoPlayer.addEventListener('error', (e) => {
     const data = videoData[currentVideoKey];
     videoPlayer.poster = (data && data.poster) ? data.poster.replace("FFF", "F00").replace("text=","text=LOAD+ERROR+-+") : 'https://placehold.co/960x540/F00/FFF?text=Video+Load+Error';
     updatePlayPauseButton();
+    isTransitioning = false;
+    hideLastFrame();
 });
 
 playPauseButton.addEventListener('click', () => {
@@ -523,13 +680,17 @@ playPauseButton.addEventListener('click', () => {
 
 function handlePlayError(error) {
     messageArea.textContent = `Playback error: ${error.message}.`;
-    console.error("Play error:", error); updatePlayPauseButton();
+    console.error("Play error:", error); 
+    updatePlayPauseButton();
 }
 
 restartButton.addEventListener('click', () => {
     playUiClick();
     messageArea.textContent = 'Restarting game...';
-    videoPlayer.pause(); resetGameState();
+    videoPlayer.pause(); 
+    resetGameState();
+    // Clear last frame on restart
+    hideLastFrame();
     loadVideo('pk_cin_stadium_flythrough_01', true);
 });
 
@@ -540,9 +701,18 @@ overlayPlayButton.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize last frame capture
+    initializeLastFrameCapture();
+    
     resetGameState();
     showMainMenuScreen();
     messageArea.textContent = "Welcome to Penalty King!";
+    
+    // Preload the initial video
+    preloadVideo('pk_cin_stadium_flythrough_01');
+    // Preload character select videos
+    preloadVideo('pk_charselect_ronaldo_01');
+    preloadVideo('pk_charselect_messi_01');
 
     document.querySelectorAll('.select-character').forEach(btn => {
         btn.addEventListener('click', () => {
