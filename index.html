@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Video Game</title>
+    <link crossorigin href="https://fonts.gstatic.com/" rel="preconnect">
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Be+Vietnam+Pro:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="style.css">
     </head>
 <body>
@@ -23,6 +27,37 @@
         <button id="overlay-play-button" class="overlay-play-button">Play</button>
         <div id="hotspot-container">
             </div>
+    </div>
+
+    <div id="character-select-screen" class="hidden relative flex size-full min-h-screen flex-col overflow-hidden">
+        <video autoplay loop muted class="absolute z-0 w-full h-full object-cover">
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+        </video>
+        <div class="absolute z-10 w-full h-full bg-black/50"></div>
+        <div class="relative z-20 flex h-full grow flex-col items-center justify-center p-4 md:p-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 w-full max-w-5xl">
+                <div class="player-card glassmorphism rounded-2xl p-6 md:p-8 flex flex-col items-center text-center relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 text-[10rem] font-black opacity-10 text-[#1978e5]">7</div>
+                    <img alt="Portugal Flag" class="w-16 h-16 md:w-20 md:h-20 mb-4 border-2 border-white/50 rounded-full shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABfJDqUIP9EcJrD_mLil1hDir3EqqSgbTF2fq96F04TeaDX1jlq4yPW_Mv7uKekME8OIFoXiNUCqAKY_WRQPzzgVFD20suEt9g7EsEdoT3axOLfyCSzj-16TtoSBy-BWNXKD70W_W-ga9v2nviM9VlN0kjEJKQG_d3hIy3dYAjT-DIWmKYFm_b9W8zKc3jp-ueQjeKYJi9VTNWQVFd_H0nMQRiJMirXMms1sNX1MKH62iCgQC9BM7WwvRddnIDiq1UQSrM677dRs0" />
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-wider mb-1">Cristiano Ronaldo</h2>
+                    <p class="text-lg md:text-xl font-semibold text-[#1978e5] mb-6">Jersey #7</p>
+                    <button data-character="ronaldo" class="select-character holographic-button w-full max-w-xs flex items-center justify-center rounded-xl py-4 px-8 text-white text-xl font-bold uppercase tracking-wider focus:outline-none focus:ring-4 focus:ring-[#1978e5] focus:ring-opacity-75">
+                        <span class="material-symbols-outlined mr-3 text-2xl">touch_app</span>
+                        Select
+                    </button>
+                </div>
+                <div class="player-card glassmorphism rounded-2xl p-6 md:p-8 flex flex-col items-center text-center relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 text-[10rem] font-black opacity-10 text-[#1978e5]">10</div>
+                    <img alt="Argentina Flag" class="w-16 h-16 md:w-20 md:h-20 mb-4 border-2 border-white/50 rounded-full shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJzU47_lw4v6DaAukvCEOk93PhRbuX_mIM3zUIQTeWyaM7a_YWttbIPWvb4IWlsPrEvx4Ap7iY5HsFlWDmdZUBNxcdrxLx3wsg5qNTvutgfk4FNHUtw8pVbkxLH2RwOuXEOf1SKwjMw0UNxTh6XNv-mqznG6I0mmLJ3coE3Ypt0TV8fs9akja62RdZ210c3ABo_EIlth1y7CZVqQaUGwT-OHyBk56Wntb7LT_mYh7divy8uPzgqImUUZccad0nc9UjIV4-usviWmY" />
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-wider mb-1">Lionel Messi</h2>
+                    <p class="text-lg md:text-xl font-semibold text-[#1978e5] mb-6">Jersey #10</p>
+                    <button data-character="messi" class="select-character holographic-button w-full max-w-xs flex items-center justify-center rounded-xl py-4 px-8 text-white text-xl font-bold uppercase tracking-wider focus:outline-none focus:ring-4 focus:ring-[#1978e5] focus:ring-opacity-75">
+                        <span class="material-symbols-outlined mr-3 text-2xl">touch_app</span>
+                        Select
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="controls">
