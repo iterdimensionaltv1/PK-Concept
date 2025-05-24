@@ -446,13 +446,21 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
   overflow: hidden;
   z-index: 20;
   padding: 2rem;
+}
+
+/* Override Tailwind flex-col to make buttons horizontal */
+.menu-screen .relative.z-20 {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .menu-screen .overlay {
@@ -573,7 +581,7 @@ body {
 
 /* Responsive Design */
 @media (min-width: 1200px) {
-  .menu-screen {
+  .menu-screen .relative.z-20 {
     gap: 3rem;
   }
   
@@ -585,10 +593,9 @@ body {
 }
 
 @media (max-width: 768px) {
-  .menu-screen {
-    flex-direction: column;
+  .menu-screen .relative.z-20 {
+    flex-direction: column !important;
     gap: 1.5rem;
-    padding: 1rem;
   }
   
   .btn-xl {
@@ -614,7 +621,7 @@ body {
 }
 
 @media (max-width: 480px) {
-  .menu-screen {
+  .menu-screen .relative.z-20 {
     gap: 1rem;
   }
   
