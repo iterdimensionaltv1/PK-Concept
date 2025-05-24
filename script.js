@@ -9,6 +9,8 @@ const bgAudio = document.getElementById('bg-audio');
 const clickAudio = document.getElementById('click-sound');
 const confirmAudio = document.getElementById('confirm-sound');
 const charSelectScreen = document.getElementById('character-select-screen');
+const mainMenuScreen = document.getElementById('main-menu-screen');
+const mainMenuVideo = document.getElementById('main-menu-video');
 
 // --- Game State & Configuration ---
 let activeHotspots = [];
@@ -190,6 +192,33 @@ function hideCharacterSelectScreen() {
     if (charSelectScreen) {
         charSelectScreen.classList.add('hidden');
     }
+}
+
+function showMainMenuScreen() {
+    if (mainMenuScreen) {
+        mainMenuScreen.classList.remove('hidden');
+        overlayPlayButton.classList.add('hidden');
+        if (mainMenuVideo) {
+            mainMenuVideo.currentTime = 0;
+            mainMenuVideo.play().catch(() => {});
+        }
+    }
+}
+
+function hideMainMenuScreen() {
+    if (mainMenuScreen) {
+        mainMenuScreen.classList.add('hidden');
+    }
+    if (mainMenuVideo) {
+        mainMenuVideo.pause();
+    }
+}
+
+function startGame() {
+    hideMainMenuScreen();
+    playUiClick();
+    resetGameState();
+    loadVideo('pk_cin_stadium_flythrough_01', true);
 }
 
 function confirmCharacter(characterName) {
@@ -500,9 +529,8 @@ overlayPlayButton.addEventListener('click', () => {
 
 window.addEventListener('load', () => {
     resetGameState();
-    loadVideo('pk_cin_stadium_flythrough_01', false);
-    overlayPlayButton.classList.remove('hidden');
-    messageArea.textContent = "Game loaded. Press Play.";
+    showMainMenuScreen();
+    messageArea.textContent = "Welcome to Penalty King!";
 
     document.querySelectorAll('.select-character').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -510,5 +538,12 @@ window.addEventListener('load', () => {
             hideCharacterSelectScreen();
             confirmCharacter(character);
         });
+    });
+
+    const playBtn = document.getElementById('menu-play');
+    const charBtn = document.getElementById('menu-character-select');
+    const settingsBtn = document.getElementById('menu-settings');
+    [playBtn, charBtn, settingsBtn].forEach(btn => {
+        if (btn) btn.addEventListener('click', startGame);
     });
 });
