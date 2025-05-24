@@ -528,7 +528,7 @@ overlayPlayButton.addEventListener('click', () => {
     videoPlayer.play().catch(handlePlayError);
 });
 
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
     resetGameState();
     showMainMenuScreen();
     messageArea.textContent = "Welcome to Penalty King!";
